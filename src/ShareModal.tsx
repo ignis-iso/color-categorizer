@@ -94,12 +94,16 @@ export default function ShareModal({ grid, onClose }: Props) {
           <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} />
         </label>
 
-        <div className="share-grid">
-          {native && (
+        {native && (
+          <div className="share-grid">
             <button className="primary wide" onClick={() => blob && nativeShare(blob, caption)}>
               Compartilhar com a imagem…
             </button>
-          )}
+          </div>
+        )}
+
+        {blob !== null && !native && (
+        <div className="share-grid">
           {links.map((l) => (
             <a key={l.name} href={l.href} target="_blank" rel="noopener noreferrer" style={{ background: l.color }}>
               {l.name}
@@ -115,6 +119,7 @@ export default function ShareModal({ grid, onClose }: Props) {
             Discord
           </button>
         </div>
+        )}
 
         <div className="share-grid small">
           <button onClick={() => blob && downloadBlob(blob)}>Baixar imagem</button>
