@@ -1,7 +1,6 @@
 import { COLORS, GRID_SIZE } from "./colors.ts";
 import { diagonalLinks, findRegions } from "./regions.ts";
-import { capitalize } from "./util.ts";
-import { t } from "./i18n.ts";
+import { displayName, t } from "./i18n.ts";
 
 const N = GRID_SIZE;
 const W = 1080, H = 1350;
@@ -88,7 +87,7 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
   // Rótulos das regiões
   ctx.lineJoin = "round";
   for (const rg of findRegions(grid)) {
-    const text = capitalize(rg.name);
+    const text = displayName(rg.name);
     const fit = (CELL * Math.max(rg.width, 1) * 0.92) / (Math.max(text.length, 1) * 0.6);
     const base = rg.size > 6 ? 32 : rg.size > 2 ? 22 : 16;
     const size = Math.max(11, Math.min(base, fit));
@@ -111,7 +110,7 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
   const rows: { name: string; n: number; w: number }[][] = [[]];
   let rowW = 0;
   for (const [name, n] of legend) {
-    const w = ctx.measureText(`${capitalize(name)} ${n}`).width + fs + 40;
+    const w = ctx.measureText(`${displayName(name)} ${n}`).width + fs + 40;
     if (rowW + w > N * CELL && rows[rows.length - 1].length) {
       rows.push([]);
       rowW = 0;
@@ -137,8 +136,8 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
       ctx.stroke();
       ctx.fillStyle = "#1d1d1d";
       ctx.textBaseline = "middle";
-      ctx.fillText(capitalize(it.name), x + 18 + fs + 4, y + ch / 2 + 1);
-      const nameW = ctx.measureText(capitalize(it.name) + " ").width;
+      ctx.fillText(displayName(it.name), x + 18 + fs + 4, y + ch / 2 + 1);
+      const nameW = ctx.measureText(displayName(it.name) + " ").width;
       ctx.fillStyle = "#1d1d1d88";
       ctx.fillText(String(it.n), x + 18 + fs + 4 + nameW, y + ch / 2 + 1);
       x += it.w + gap;

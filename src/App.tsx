@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { COLORS, GRID_SIZE } from "./colors.ts";
-import { normalize, outerFirstOrder } from "./util.ts";
+import { normalize, startOrder } from "./util.ts";
 import Intro from "./Intro.tsx";
 import Game from "./Game.tsx";
 import Result from "./Result.tsx";
+import Painter from "./Painter.tsx";
 import { getLang, LANGS, setLang, useT, type Lang } from "./i18n.ts";
+import type { Mode, Size } from "./modes.ts";
 
 type Phase = "intro" | "play" | "result";
 const KEY = "color-categorizer:v1";
 
+// mode/size são opcionais: saves antigos (sem eles) são tratados como "livre" e 256 cores.
 interface Saved {
   order: number[];
   labels: Record<number, string>;
+  mode?: Mode;
+  size?: Size;
 }
 
 function load(): Saved | null {
@@ -23,22 +27,27 @@ function load(): Saved | null {
   }
 }
 
+const answeredCount = (order: number[], labels: Record<number, string>) =>
+  order.filter((i) => labels[i] !== undefined).length;
+
 export default function App() {
   const t = useT();
+  const saved = useMemo(load, []);
   const [phase, setPhase] = useState<Phase>("intro");
   const [order, setOrder] = useState<number[]>([]);
   const [labels, setLabels] = useState<Record<number, string>>({});
-  const saved = useMemo(load, []);
+  const [mode, setMode] = useState<Mode>("free");
+  const [size, setSize] = useState<Size>(256);
 
   useEffect(() => {
     if (order.length === 0) return;
     try {
-      localStorage.setItem(KEY, JSON.stringify({ order, labels }));
+      localStorage.setItem(KEY, JSON.stringify({ order, labels, mode, size }));
     } catch { /* ignore */ }
-  }, [order, labels]);
+  }, [order, labels, mode, size]);
 
   const start = () => {
-    setOrder(outerFirstOrder(GRID_SIZE));
+    setOrder(startOrder(mode === "grid" ? 256 : size));
     setLabels({});
     setPhase("play");
   };
@@ -47,7 +56,9 @@ export default function App() {
     if (!saved) return;
     setOrder(saved.order);
     setLabels(saved.labels);
-    setPhase(Object.keys(saved.labels).length >= COLORS.length ? "result" : "play");
+    setMode(saved.mode ?? "free");
+    setSize((saved.size ?? (saved.order.length as Size)) as Size);
+    setPhase(answeredCount(saved.order, saved.labels) >= saved.order.length ? "result" : "play");
   };
 
   const restart = () => {
@@ -58,9 +69,16 @@ export default function App() {
   };
 
   const answer = (idx: number, name: string) =>
-    setLabels((l) => ({ ...l, [idx]: normalize(name) }));
+    setLabels((l) => ({ ...l, [idx]: name.startsWith("@") ? name : normalize(name) }));
 
-  const progress = saved && saved.order.length > 0 ? Object.keys(saved.labels).length : 0;
+  const applyMany = (idxs: number[], name: string) =>
+    setLabels((l) => {
+      const next = { ...l };
+      for (const i of idxs) next[i] = normalize(name);
+      return next;
+    });
+
+  const progress = saved && saved.order.length > 0 ? answeredCount(saved.order, saved.labels) : 0;
 
   return (
     <main className={`app app-${phase}`}>
@@ -76,20 +94,30 @@ export default function App() {
       </select>
       {phase === "intro" && (
         <Intro
+          mode={mode}
+          size={size}
+          onMode={setMode}
+          onSize={setSize}
           onStart={start}
-          onResume={progress > 0 && progress <= COLORS.length ? resume : undefined}
-          resumeCount={progress}
+          onResume={saved && progress > 0 ? resume : undefined}
+          resumeLabel={saved ? t.resume(progress, saved.order.length) : ""}
         />
       )}
-      {phase === "play" && (
+      {phase === "play" && mode === "grid" && (
+        <Painter labels={labels} onApply={applyMany} onFinish={() => setPhase("result")} />
+      )}
+      {phase === "play" && mode !== "grid" && (
         <Game
           order={order}
           labels={labels}
+          mode={mode}
           onAnswer={answer}
           onFinish={() => setPhase("result")}
         />
       )}
-      {phase === "result" && <Result labels={labels} onRestart={restart} onChange={answer} />}
+      {phase === "result" && (
+        <Result labels={labels} total={order.length} mode={mode} onRestart={restart} onChange={answer} />
+      )}
     </main>
   );
 }

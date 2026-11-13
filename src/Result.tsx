@@ -1,12 +1,15 @@
 import { useMemo, useState } from "react";
 import { COLORS, GRID_SIZE } from "./colors.ts";
-import { capitalize, normalize } from "./util.ts";
+import { fillGrid, normalize } from "./util.ts";
+import { CAT_COLORS, modeCategories, type Mode } from "./modes.ts";
 import { diagonalLinks, findRegions } from "./regions.ts";
 import ShareModal from "./ShareModal.tsx";
-import { useT } from "./i18n.ts";
+import { displayName, useT } from "./i18n.ts";
 
 interface Props {
   labels: Record<number, string>;
+  total: number;
+  mode: Mode;
   onRestart: () => void;
   onChange: (idx: number, name: string) => void;
 }
@@ -15,7 +18,7 @@ const CELL = 40;
 const N = GRID_SIZE;
 const SIZE = CELL * N;
 
-export default function Result({ labels, onRestart, onChange }: Props) {
+export default function Result({ labels, total, mode, onRestart, onChange }: Props) {
   const t = useT();
   const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
@@ -27,7 +30,8 @@ export default function Result({ labels, onRestart, onChange }: Props) {
     setSelected(null);
     setNewName("");
   };
-  const grid = useMemo(() => COLORS.map((_, i) => labels[i] ?? "?"), [labels]);
+  const grid = useMemo(() => fillGrid(labels), [labels]);
+  const fixedCats = modeCategories(mode);
 
   const { lines, regions, links, legend } = useMemo(() => {
     const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
@@ -54,7 +58,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
     <section className="result">
       <h1>{t.resultTitle}</h1>
       <p className="lead">
-        {t.resultLead(legend.length, COLORS.length)}
+        {t.resultLead(legend.length, total)}
       </p>
 
       <div className="editbar">
@@ -68,7 +72,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
           {editing ? t.doneEditing : t.edit}
         </button>
         {editing && (
-          <span>{t.editHint}</span>
+          <span>{fixedCats.length ? t.editHintFixed : t.editHint}</span>
         )}
       </div>
 
@@ -113,7 +117,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
               className="region-label"
               fontSize={Math.max(8, Math.min(base, fit))}
             >
-              {capitalize(rg.name)}
+              {displayName(rg.name)}
             </text>
           );
         })}
@@ -149,20 +153,22 @@ export default function Result({ labels, onRestart, onChange }: Props) {
         <div className="editpanel">
           <i className="mini" style={{ background: COLORS[selected] }} />
           <span>
-            {t.current}: <strong>{capitalize(grid[selected])}</strong>. {t.moveTo}
+            {t.current}: <strong>{displayName(grid[selected])}</strong>. {t.moveTo}
           </span>
           <div className="chips">
-            {legend.map(([name]) => (
+            {(fixedCats.length ? fixedCats.map((n) => [n]) : legend).map(([name]) => (
               <button
                 key={name}
                 className={name === grid[selected] ? "chip active" : "chip"}
                 disabled={name === grid[selected]}
                 onClick={() => assign(name)}
               >
-                {capitalize(name)}
+                {fixedCats.length > 0 && <i className="dot" style={{ background: CAT_COLORS[name] }} />}
+                {displayName(name)}
               </button>
             ))}
           </div>
+          {fixedCats.length === 0 && (
           <form
             className="newcat"
             onSubmit={(e) => {
@@ -180,9 +186,11 @@ export default function Result({ labels, onRestart, onChange }: Props) {
               {t.createMove}
             </button>
           </form>
+          )}
         </div>
       )}
 
+      {total < COLORS.length && <p className="note">{t.inferNote(total)}</p>}
       <p className="hint">
         {t.diagHint}
       </p>
@@ -193,7 +201,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
           return (
             <li key={name}>
               <i style={{ background: avg }} />
-              {capitalize(name)} <span>{n}</span>
+              {displayName(name)} <span>{n}</span>
             </li>
           );
         })}

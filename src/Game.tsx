@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COLORS } from "./colors.ts";
-import { capitalize, normalize } from "./util.ts";
-import { useT } from "./i18n.ts";
+import { normalize } from "./util.ts";
+import { displayName, useT } from "./i18n.ts";
+import { CAT_COLORS, isFixed, modeCategories, type Mode } from "./modes.ts";
 
 interface Props {
   order: number[];
   labels: Record<number, string>;
+  mode: Mode;
   onAnswer: (idx: number, name: string) => void;
   onFinish: () => void;
 }
 
-export default function Game({ order, labels, onAnswer, onFinish }: Props) {
+export default function Game({ order, labels, mode, onAnswer, onFinish }: Props) {
   const t = useT();
+  const fixed = isFixed(mode);
+  const fixedCats = modeCategories(mode);
+  const total = order.length;
   // Começa na primeira cor ainda sem nome (útil ao retomar).
   const [pos, setPos] = useState(() => {
     const first = order.findIndex((i) => labels[i] === undefined);
@@ -25,7 +30,7 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
 
   const idx = order[pos];
   const color = COLORS[idx];
-  const done = Object.keys(labels).length;
+  const done = order.filter((i) => labels[i] !== undefined).length;
 
   // Ordem fixa das categorias: a da primeira vez que cada nome apareceu.
   // Ao retomar, reconstrói pela ordem de jogo; depois só acrescenta novos nomes no fim.
@@ -39,6 +44,7 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
   const used = useMemo(() => {
     const count = new Map<string, number>();
     for (const v of Object.values(labels)) count.set(v, (count.get(v) ?? 0) + 1);
+    if (fixed) return fixedCats.map((n): [string, number] => [n, count.get(n) ?? 0]);
     return nameOrder.current
       .filter((n) => count.has(n))
       .map((n): [string, number] => [n, count.get(n)!]);
@@ -46,34 +52,35 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
 
   useEffect(() => {
     setText(labels[idx] ?? "");
-    if (!skipFocus.current) inputRef.current?.focus();
+    if (!skipFocus.current && !fixed) inputRef.current?.focus();
     skipFocus.current = false;
     // deno-lint-ignore react-hooks/exhaustive-deps
   }, [pos]);
 
   const submit = (name: string) => {
-    const n = normalize(name);
+    const n = fixed ? name : normalize(name);
     if (!n) return;
     onAnswer(idx, n);
     if (pos + 1 < order.length) setPos(pos + 1);
-    else if (done + (labels[idx] === undefined ? 1 : 0) >= COLORS.length) onFinish();
+    else if (done + (labels[idx] === undefined ? 1 : 0) >= total) onFinish();
   };
 
-  const allDone = done >= COLORS.length;
+  const allDone = done >= total;
   const typed = normalize(text);
   const isNew = typed !== "" && !used.some(([n]) => n === typed);
 
   return (
     <section className="game">
       <div className="progress" aria-label={t.progressLabel}>
-        <div className="bar" style={{ width: `${(done / COLORS.length) * 100}%` }} />
+        <div className="bar" style={{ width: `${(done / total) * 100}%` }} />
       </div>
       <p className="counter">
-        {t.counter(pos + 1, COLORS.length, used.length)}
+        {fixed ? `${pos + 1} / ${total}` : t.counter(pos + 1, total, used.length)}
       </p>
 
       <div className="swatch" style={{ background: color }} />
 
+      {!fixed && (
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -92,26 +99,28 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
           {pos + 1 === order.length ? t.finish : t.next}
         </button>
       </form>
+      )}
 
-      {isNew && used.length >= 12 && (
+      {!fixed && isNew && used.length >= 12 && (
         <p className="warn">
           {t.tooMany(used.length)}
         </p>
       )}
 
       {used.length > 0 && (
-        <div className="chips">
+        <div className={fixed ? "chips fixed" : "chips"}>
           {used.map(([name, n]) => (
             <button
               key={name}
               type="button"
-              className={name === typed ? "chip active" : "chip"}
+              className={name === (fixed ? labels[idx] : typed) ? "chip active" : "chip"}
               onClick={() => {
                 skipFocus.current = true;
                 submit(name);
               }}
             >
-              {capitalize(name)} <span>{n}</span>
+              {fixed && <i className="dot" style={{ background: CAT_COLORS[name] }} />}
+              {displayName(name)} {!fixed && <span>{n}</span>}
             </button>
           ))}
         </div>

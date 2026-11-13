@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from "react";
+import { capitalize } from "./util.ts";
+import type { Mode } from "./modes.ts";
 
 export type Lang = "pt" | "en" | "es";
 export const LANGS: { code: Lang; label: string }[] = [
@@ -57,6 +59,25 @@ interface Dict {
   imgFooter: string;
   shareText: string;
   language: string;
+  // Modos e tamanho
+  modeTitle: string;
+  modes: Record<Mode, { name: string; desc: string }>;
+  sizeTitle: string;
+  sizeOpt: (n: number) => string;
+  fixedTip: string;
+  inferNote: (n: number) => string;
+  editHintFixed: string;
+  catNames: Record<string, string>;
+  // Modo grade
+  gridTip: string;
+  paintHint: string;
+  selectedCount: (n: number) => string;
+  classifiedCount: (n: number, total: number) => string;
+  apply: string;
+  clearSelection: string;
+  selectUnclassified: string;
+  nameArea: string;
+  unclassifiedLeft: (n: number) => string;
 }
 
 const pt: Dict = {
@@ -114,6 +135,29 @@ const pt: Dict = {
   imgFooter: "Faça o seu:",
   shareText: "Essas são as cores pra mim! 🎨 Será que seu vermelho é o meu vermelho? Faz o seu:",
   language: "Idioma",
+  modeTitle: "Modo de classificação",
+  modes: {
+    free: { name: "Livre", desc: "Dê os nomes que quiser" },
+    grid: { name: "Grade", desc: "Escolha as cores na grade e dê nomes às áreas" },
+    rgb: { name: "Primárias RGB", desc: "Vermelho, verde e azul" },
+    paint: { name: "Primárias de tinta", desc: "Azul, vermelho, verde e amarelo" },
+    rainbow: { name: "Arco-íris", desc: "As 7 cores do arco-íris" },
+  },
+  sizeTitle: "Tamanho do teste",
+  sizeOpt: (n) => `${n} cores`,
+  fixedTip: "Para cada cor, escolha a categoria mais próxima. Não existe resposta certa!",
+  inferNote: (n) => `Com ${n} cores testadas, as demais foram preenchidas pela cor testada mais próxima.`,
+  editHintFixed: "Clique em um quadrado e escolha a categoria.",
+  catNames: { red: "Vermelho", green: "Verde", blue: "Azul", yellow: "Amarelo", orange: "Laranja", indigo: "Anil", violet: "Violeta" },
+  gridTip: "Selecione cores na grade e dê um nome a cada área.",
+  paintHint: "Toque ou arraste sobre os quadrados para selecioná-los, escolha um nome e aplique. Faça isso até classificar todas as cores.",
+  selectedCount: (n) => `${n} selecionada${n === 1 ? "" : "s"}`,
+  classifiedCount: (n, total) => `${n} de ${total} classificadas`,
+  apply: "Aplicar nome",
+  clearSelection: "Limpar seleção",
+  selectUnclassified: "Selecionar não classificadas",
+  nameArea: "Nome da área…",
+  unclassifiedLeft: (n) => `Faltam ${n} cores sem nome`,
 };
 
 const en: Dict = {
@@ -171,6 +215,29 @@ const en: Dict = {
   imgFooter: "Take yours:",
   shareText: "These are the colors to me! 🎨 Is your red my red? Take yours:",
   language: "Language",
+  modeTitle: "Classification mode",
+  modes: {
+    free: { name: "Free", desc: "Name colors anything you like" },
+    grid: { name: "Grid", desc: "Pick colors on the grid and name the areas" },
+    rgb: { name: "RGB primaries", desc: "Red, green and blue" },
+    paint: { name: "Paint primaries", desc: "Blue, red, green and yellow" },
+    rainbow: { name: "Rainbow", desc: "The 7 colors of the rainbow" },
+  },
+  sizeTitle: "Test size",
+  sizeOpt: (n) => `${n} colors`,
+  fixedTip: "For each color, pick the closest category. There is no right answer!",
+  inferNote: (n) => `With ${n} colors tested, the others were filled in from the closest tested color.`,
+  editHintFixed: "Click a square and pick the category.",
+  catNames: { red: "Red", green: "Green", blue: "Blue", yellow: "Yellow", orange: "Orange", indigo: "Indigo", violet: "Violet" },
+  gridTip: "Select colors on the grid and give each area a name.",
+  paintHint: "Tap or drag over the squares to select them, choose a name and apply it. Keep going until every color is classified.",
+  selectedCount: (n) => `${n} selected`,
+  classifiedCount: (n, total) => `${n} of ${total} classified`,
+  apply: "Apply name",
+  clearSelection: "Clear selection",
+  selectUnclassified: "Select unclassified",
+  nameArea: "Area name…",
+  unclassifiedLeft: (n) => `${n} colors still without a name`,
 };
 
 const es: Dict = {
@@ -228,6 +295,29 @@ const es: Dict = {
   imgFooter: "Haz el tuyo:",
   shareText: "¡Estos son los colores para mí! 🎨 ¿Tu rojo es mi rojo? Haz el tuyo:",
   language: "Idioma",
+  modeTitle: "Modo de clasificación",
+  modes: {
+    free: { name: "Libre", desc: "Pon los nombres que quieras" },
+    grid: { name: "Cuadrícula", desc: "Elige colores en la cuadrícula y nombra las áreas" },
+    rgb: { name: "Primarios RGB", desc: "Rojo, verde y azul" },
+    paint: { name: "Primarios de pintura", desc: "Azul, rojo, verde y amarillo" },
+    rainbow: { name: "Arcoíris", desc: "Los 7 colores del arcoíris" },
+  },
+  sizeTitle: "Tamaño de la prueba",
+  sizeOpt: (n) => `${n} colores`,
+  fixedTip: "Para cada color, elige la categoría más cercana. ¡No hay respuesta correcta!",
+  inferNote: (n) => `Con ${n} colores probados, el resto se completó con el color probado más cercano.`,
+  editHintFixed: "Haz clic en un cuadrado y elige la categoría.",
+  catNames: { red: "Rojo", green: "Verde", blue: "Azul", yellow: "Amarillo", orange: "Naranja", indigo: "Índigo", violet: "Violeta" },
+  gridTip: "Selecciona colores en la cuadrícula y ponle nombre a cada área.",
+  paintHint: "Toca o arrastra sobre los cuadrados para seleccionarlos, elige un nombre y aplícalo. Sigue hasta clasificar todos los colores.",
+  selectedCount: (n) => `${n} seleccionado${n === 1 ? "" : "s"}`,
+  classifiedCount: (n, total) => `${n} de ${total} clasificados`,
+  apply: "Aplicar nombre",
+  clearSelection: "Borrar selección",
+  selectUnclassified: "Seleccionar sin clasificar",
+  nameArea: "Nombre del área…",
+  unclassifiedLeft: (n) => `Faltan ${n} colores sin nombre`,
 };
 
 const DICTS: Record<Lang, Dict> = { pt, en, es };
@@ -256,6 +346,11 @@ export function setLang(l: Lang) {
 }
 
 export const getLang = () => current;
+
+/** Nome exibido de uma categoria: chaves "@x" (modos fixos) são traduzidas; o resto é capitalizado. */
+export function displayName(label: string): string {
+  return label.startsWith("@") ? (t().catNames[label.slice(1)] ?? label) : capitalize(label);
+}
 /** Dicionário do idioma atual (use useT() dentro de componentes para reagir à troca). */
 export const t = (): Dict => DICTS[current];
 
