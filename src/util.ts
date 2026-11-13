@@ -21,3 +21,16 @@ export function shuffle<T>(arr: readonly T[]): T[] {
 export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+/**
+ * Ordem do teste: primeiro as cores da borda da grade (as mais "puras", fáceis de nomear),
+ * em ordem aleatória; depois todas as demais, também aleatórias.
+ */
+export function outerFirstOrder(size: number): number[] {
+  const all = Array.from({ length: size * size }, (_, i) => i);
+  const isOuter = (i: number) => {
+    const r = Math.floor(i / size), c = i % size;
+    return r === 0 || c === 0 || r === size - 1 || c === size - 1;
+  };
+  return [...shuffle(all.filter(isOuter)), ...shuffle(all.filter((i) => !isOuter(i)))];
+}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { COLORS } from "./colors.ts";
-import { normalize, shuffle } from "./util.ts";
+import { COLORS, GRID_SIZE } from "./colors.ts";
+import { normalize, outerFirstOrder } from "./util.ts";
 import Intro from "./Intro.tsx";
 import Game from "./Game.tsx";
 import Result from "./Result.tsx";
@@ -38,7 +38,7 @@ export default function App() {
   }, [order, labels]);
 
   const start = () => {
-    setOrder(shuffle(COLORS.map((_, i) => i)));
+    setOrder(outerFirstOrder(GRID_SIZE));
     setLabels({});
     setPhase("play");
   };
