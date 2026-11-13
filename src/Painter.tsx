@@ -159,7 +159,7 @@ export default function Painter({ labels, onApply, onFinish }: Props) {
       {names.length > 0 && (
         <div className="chips">
           {names.map((n) => (
-            <button key={n} type="button" className="chip" disabled={selected.size === 0} onClick={() => apply(n)}>
+            <button key={n} type="button" className="chip" onClick={() => apply(n)}>
               {displayName(n)}
             </button>
           ))}

@@ -82,3 +82,29 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .actions.center { justify-content: center; }
 .note { font-size: .85rem; opacity: .9; margin: 8px 0 0; }
 .modedesc { background: #e6e6e6; border-left: 4px solid #222; padding: 10px 14px; border-radius: 6px; font-size: .92rem; line-height: 1.5; margin: 4px 0 12px; }
+
+/* ---- Ajustes para iOS / telas pequenas ---- */
+html { -webkit-text-size-adjust: 100%; }
+body { min-height: 100dvh; }
+button, input, select, textarea { -webkit-appearance: none; appearance: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+input, textarea { box-shadow: none; background: #fff; color: var(--ink); font-size: 16px; }
+.app { min-height: 100dvh; padding: 56px 16px calc(32px + env(safe-area-inset-bottom)); }
+.lang {
+  position: absolute; top: 12px; right: 12px; z-index: 5; font-size: 16px; color: var(--ink);
+  padding: 7px 30px 7px 12px; border-radius: 10px; border: 1px solid #0003; background: #f2f2f2
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23444' stroke-width='2'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+}
+.paintgrid { -webkit-touch-callout: none; -webkit-user-select: none; }
+.nav { gap: 10px; }
+.nav button { flex: 1; }
+.chip { color: var(--ink); }
+.chip.active { color: #fff; }
+button:disabled { opacity: .5; }
+@media (max-width: 480px) {
+  .card { padding: 20px 18px; }
+  .share-actions button { flex: 1 1 100%; }
+  .option { flex: 1 1 100%; }
+  .sizes .option { flex: 1 1 28%; align-items: center; text-align: center; }
+  form { flex-wrap: nowrap; }
+}
