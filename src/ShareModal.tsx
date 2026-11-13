@@ -65,6 +65,20 @@ export default function ShareModal({ grid, onClose }: Props) {
     );
   };
 
+  // Discord não tem link de compartilhamento: no celular usa o menu nativo; no computador
+  // copia a imagem para colar (Ctrl+V) no chat e abre o Discord.
+  const viaDiscord = async () => {
+    if (!blob) return;
+    if (native && (await nativeShare(blob, caption))) return;
+    window.open("https://discord.com/channels/@me", "_blank", "noopener,noreferrer");
+    if (await copyImage(blob)) {
+      setMsg("Imagem copiada! No Discord, escolha o chat e cole com Ctrl+V. Use “Copiar texto” para a legenda.");
+    } else {
+      downloadBlob(blob);
+      setMsg("Imagem baixada! No Discord, anexe a imagem salva ao chat.");
+    }
+  };
+
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
@@ -96,6 +110,9 @@ export default function ShareModal({ grid, onClose }: Props) {
           </button>
           <button style={{ background: "#000", color: "#fff" }} onClick={() => viaApp("TikTok")}>
             TikTok
+          </button>
+          <button style={{ background: "#5865f2", color: "#fff" }} onClick={viaDiscord}>
+            Discord
           </button>
         </div>
 
