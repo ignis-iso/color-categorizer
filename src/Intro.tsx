@@ -21,16 +21,17 @@ export default function Intro({ mode, size, onMode, onSize, onStart, onResume, r
       <h2>{t.modeTitle}</h2>
       <div className="options">
         {MODES.map((m) => (
-          <button
-            key={m}
-            type="button"
-            className={m === mode ? "option active" : "option"}
-            onClick={() => onMode(m)}
-          >
-            <strong>{t.modes[m].name}</strong>
-            {m === "free" && <em className="badge">{t.recommended}</em>}
-            <span>{t.modes[m].desc}</span>
-          </button>
+          <div key={m} className="optwrap">
+            <button
+              type="button"
+              className={m === mode ? "option active" : "option"}
+              onClick={() => onMode(m)}
+            >
+              <strong>{t.modes[m].name}</strong>
+              <span>{t.modes[m].desc}</span>
+            </button>
+            {m === "free" && <small className="rec">{t.recommended}</small>}
+          </div>
         ))}
       </div>
 
@@ -40,15 +41,16 @@ export default function Intro({ mode, size, onMode, onSize, onStart, onResume, r
       {mode !== "grid" && (
       <div className="options sizes">
         {SIZES.map((s) => (
-          <button
-            key={s}
-            type="button"
-            className={s === size ? "option active" : "option"}
-            onClick={() => onSize(s)}
-          >
-            <strong>{t.sizeOpt(s)}</strong>
-            {s === 256 && <em className="badge">{t.recommended}</em>}
-          </button>
+          <div key={s} className="optwrap">
+            <button
+              type="button"
+              className={s === size ? "option active" : "option"}
+              onClick={() => onSize(s)}
+            >
+              <strong>{t.sizeOpt(s)}</strong>
+            </button>
+            {s === 256 && <small className="rec">{t.recommended}</small>}
+          </div>
         ))}
       </div>
       )}

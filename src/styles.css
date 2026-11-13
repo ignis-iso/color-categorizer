@@ -120,3 +120,14 @@ button.option:hover:not(:disabled):not(.active) { background: #d0d0d0; }
 /* "Recomendado": texto discreto com uma estrela, sem selo */
 .badge, .option .badge { background: none; color: inherit; padding: 0; border-radius: 0; text-transform: none; letter-spacing: 0; font-size: .78rem; font-weight: 600; opacity: .8; margin-top: 0; }
 .badge::before { content: "★ "; }
+
+/* Recomendado fora do botão, para não desalinhar o texto interno */
+.optwrap { display: flex; flex-direction: column; gap: 4px; flex: 1 1 150px; }
+.optwrap .option { flex: none; width: 100%; }
+.sizes .optwrap { flex: 0 0 auto; }
+.rec { font-size: .78rem; font-weight: 600; color: #2e5d32; }
+.rec::before { content: "★ "; }
+@media (max-width: 480px) {
+  .optwrap { flex: 1 1 100%; }
+  .sizes .optwrap { flex: 1 1 28%; align-items: stretch; }
+}
