@@ -110,3 +110,9 @@ button:disabled { opacity: .5; }
 }
 .badge { font-style: normal; font-size: .68rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; background: #2e7d32; color: #fff; padding: 2px 8px; border-radius: 999px; margin-top: 2px; }
 .option .badge { opacity: 1; font-size: .68rem; }
+
+/* hover não pode apagar o estilo dos botões ativos (texto branco sobre fundo escuro) */
+button.option.active:hover:not(:disabled),
+button.chip.active:hover:not(:disabled),
+.editpanel .chip.active:hover:not(:disabled) { background: #222; color: #fff; }
+button.option:hover:not(:disabled):not(.active) { background: #d0d0d0; }
