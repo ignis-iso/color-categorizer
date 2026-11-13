@@ -64,8 +64,22 @@ function findRegions(grid: string[]): Region[] {
   return regions;
 }
 
-/** Pares de células da mesma categoria que só se tocam pela diagonal (sem vizinho em comum). */
+/**
+ * Ligações diagonais necessárias: pares da mesma categoria que só se tocam pela quina
+ * E que ainda não estão conectados (por lados) em outro lugar. Se já fazem parte do
+ * mesmo bloco contínuo, a ligação seria redundante e não é desenhada.
+ */
 function diagonalLinks(grid: string[]) {
+  const parent = Array.from({ length: grid.length }, (_, i) => i);
+  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  const union = (a: number, b: number) => { parent[find(a)] = find(b); };
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const i = r * N + c;
+      if (c + 1 < N && grid[i] === grid[i + 1]) union(i, i + 1);
+      if (r + 1 < N && grid[i] === grid[i + N]) union(i, i + N);
+    }
+  }
   const links: { r1: number; c1: number; r2: number; c2: number }[] = [];
   for (let r = 0; r + 1 < N; r++) {
     for (let c = 0; c < N; c++) {
@@ -74,9 +88,11 @@ function diagonalLinks(grid: string[]) {
         const c2 = c + dc;
         if (c2 < 0 || c2 >= N) continue;
         if (grid[(r + 1) * N + c2] !== a) continue;
-        // os dois vizinhos ortogonais em comum são de outra categoria => ligação só pela diagonal
-        if (grid[r * N + c2] !== a && grid[(r + 1) * N + c] !== a)
-          links.push({ r1: r, c1: c, r2: r + 1, c2 });
+        if (grid[r * N + c2] === a || grid[(r + 1) * N + c] === a) continue;
+        const i1 = r * N + c, i2 = (r + 1) * N + c2;
+        if (find(i1) === find(i2)) continue;
+        union(i1, i2);
+        links.push({ r1: r, c1: c, r2: r + 1, c2 });
       }
     }
   }
