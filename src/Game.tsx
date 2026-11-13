@@ -22,11 +22,21 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
   const color = COLORS[idx];
   const done = Object.keys(labels).length;
 
-  // Categorias já usadas, da mais frequente para a menos.
+  // Ordem fixa das categorias: a da primeira vez que cada nome apareceu.
+  // Ao retomar, reconstrói pela ordem de jogo; depois só acrescenta novos nomes no fim.
+  const nameOrder = useRef<string[]>(
+    [...new Set(order.map((i) => labels[i]).filter((n): n is string => n !== undefined))],
+  );
+  for (const n of Object.values(labels)) {
+    if (!nameOrder.current.includes(n)) nameOrder.current.push(n);
+  }
+
   const used = useMemo(() => {
     const count = new Map<string, number>();
     for (const v of Object.values(labels)) count.set(v, (count.get(v) ?? 0) + 1);
-    return [...count.entries()].sort((a, b) => b[1] - a[1]);
+    return nameOrder.current
+      .filter((n) => count.has(n))
+      .map((n): [string, number] => [n, count.get(n)!]);
   }, [labels]);
 
   useEffect(() => {
