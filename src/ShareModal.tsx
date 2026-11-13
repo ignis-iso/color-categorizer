@@ -18,7 +18,7 @@ export default function ShareModal({ grid, onClose }: Props) {
   const [blob, setBlob] = useState<Blob | null>(null);
   const [preview, setPreview] = useState("");
   const [msg, setMsg] = useState("");
-  const [caption, setCaption] = useState(defaultCaption);
+  const caption = defaultCaption();
 
   useEffect(() => {
     let url = "";
@@ -72,7 +72,7 @@ export default function ShareModal({ grid, onClose }: Props) {
     if (native && (await nativeShare(blob, caption))) return;
     window.open("https://discord.com/channels/@me", "_blank", "noopener,noreferrer");
     if (await copyImage(blob)) {
-      setMsg("Imagem copiada! No Discord, escolha o chat e cole com Ctrl+V. Use “Copiar texto” para a legenda.");
+      setMsg("Imagem copiada! No Discord, escolha o chat e cole com Ctrl+V.");
     } else {
       downloadBlob(blob);
       setMsg("Imagem baixada! No Discord, anexe a imagem salva ao chat.");
@@ -88,11 +88,6 @@ export default function ShareModal({ grid, onClose }: Props) {
         <div className="preview">
           {preview ? <img src={preview} alt="Prévia da imagem para compartilhar" /> : <p>Gerando imagem…</p>}
         </div>
-
-        <label className="caption">
-          Texto da publicação (com o link do site)
-          <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} />
-        </label>
 
         {native && (
           <div className="share-grid">
@@ -126,22 +121,10 @@ export default function ShareModal({ grid, onClose }: Props) {
           <button onClick={async () => blob && setMsg((await copyImage(blob)) ? "Imagem copiada!" : "Não consegui copiar a imagem; use Baixar.")}>
             Copiar imagem
           </button>
-          <button
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(caption);
-                setMsg("Texto copiado!");
-              } catch {
-                setMsg("Não consegui copiar; selecione o texto acima.");
-              }
-            }}
-          >
-            Copiar texto
-          </button>
         </div>
 
         <p className="share-note">
-          {msg || "Os botões de rede abrem com o texto acima. Para anexar a imagem, baixe-a ou use o menu do celular."}
+          {msg || "Os botões de rede abrem com um texto e o link do site. Para anexar a imagem, baixe-a ou use o menu do celular."}
         </p>
       </div>
     </div>
