@@ -112,7 +112,7 @@ const pt: Dict = {
   close: "Fechar",
   imgSubtitle: "Este é o meu gráfico de categorização de cores",
   imgFooter: "Faça o seu:",
-  shareText: "Este é o meu gráfico de categorização de cores. Seu vermelho é o meu vermelho? Faça o seu:",
+  shareText: "Essas são as cores pra mim! 🎨 Será que seu vermelho é o meu vermelho? Faz o seu:",
   language: "Idioma",
 };
 
@@ -169,7 +169,7 @@ const en: Dict = {
   close: "Close",
   imgSubtitle: "This is my color categorization chart",
   imgFooter: "Take yours:",
-  shareText: "This is my color categorization chart. Is your red my red? Take yours:",
+  shareText: "These are the colors to me! 🎨 Is your red my red? Take yours:",
   language: "Language",
 };
 
@@ -226,7 +226,7 @@ const es: Dict = {
   close: "Cerrar",
   imgSubtitle: "Este es mi gráfico de categorización de colores",
   imgFooter: "Haz el tuyo:",
-  shareText: "Este es mi gráfico de categorización de colores. ¿Tu rojo es mi rojo? Haz el tuyo:",
+  shareText: "¡Estos son los colores para mí! 🎨 ¿Tu rojo es mi rojo? Haz el tuyo:",
   language: "Idioma",
 };
 
