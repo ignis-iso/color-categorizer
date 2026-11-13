@@ -6,7 +6,6 @@ import {
   downloadBlob,
   makeShareBlob,
   nativeShare,
-  shareUrl,
 } from "./shareImage.ts";
 
 interface Props {
@@ -35,49 +34,8 @@ export default function ShareModal({ grid, onClose }: Props) {
     };
   }, [grid, onClose]);
 
-  const both = encodeURIComponent(caption);
-  const link = encodeURIComponent(shareUrl());
-  // X e Telegram recebem o link separado; tira-o do texto para não duplicar.
-  const textOnly = encodeURIComponent(caption.replace(shareUrl(), "").trim());
-
-  const links = [
-    { name: "WhatsApp", color: "#25d366", href: `https://wa.me/?text=${both}` },
-    { name: "X / Twitter", color: "#111", href: `https://twitter.com/intent/tweet?text=${textOnly}&url=${link}` },
-    { name: "Facebook", color: "#1877f2", href: `https://www.facebook.com/sharer/sharer.php?u=${link}` },
-    { name: "Telegram", color: "#2aabee", href: `https://t.me/share/url?url=${link}&text=${textOnly}` },
-  ];
-
+  // Menu nativo de compartilhar (celulares): já lista WhatsApp, Instagram, TikTok, Discord etc.
   const native = blob !== null && canShareFiles(blob);
-
-  // Instagram e TikTok não aceitam postagem por link: usa o menu nativo (celular)
-  // ou baixa a imagem para o usuário postar no app.
-  const viaApp = async (app: string) => {
-    if (!blob) return;
-    if (native && (await nativeShare(blob, caption))) return;
-    downloadBlob(blob);
-    let copied = false;
-    try {
-      await navigator.clipboard.writeText(caption);
-      copied = true;
-    } catch { /* ignore */ }
-    setMsg(
-      `Imagem baixada${copied ? " e legenda copiada" : ""}! Abra o ${app}, publique a imagem${copied ? " e cole a legenda" : ""}.`,
-    );
-  };
-
-  // Discord não tem link de compartilhamento: no celular usa o menu nativo; no computador
-  // copia a imagem para colar (Ctrl+V) no chat e abre o Discord.
-  const viaDiscord = async () => {
-    if (!blob) return;
-    if (native && (await nativeShare(blob, caption))) return;
-    window.open("https://discord.com/channels/@me", "_blank", "noopener,noreferrer");
-    if (await copyImage(blob)) {
-      setMsg("Imagem copiada! No Discord, escolha o chat e cole com Ctrl+V.");
-    } else {
-      downloadBlob(blob);
-      setMsg("Imagem baixada! No Discord, anexe a imagem salva ao chat.");
-    }
-  };
 
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -89,36 +47,17 @@ export default function ShareModal({ grid, onClose }: Props) {
           {preview ? <img src={preview} alt="Prévia da imagem para compartilhar" /> : <p>Gerando imagem…</p>}
         </div>
 
-        {native && (
-          <div className="share-grid">
-            <button className="primary wide" onClick={() => blob && nativeShare(blob, caption)}>
+        <div className="share-actions">
+          {native && (
+            <button className="primary" onClick={() => blob && nativeShare(blob, caption)}>
               Compartilhar com a imagem…
             </button>
-          </div>
-        )}
-
-        {blob !== null && !native && (
-        <div className="share-grid">
-          {links.map((l) => (
-            <a key={l.name} href={l.href} target="_blank" rel="noopener noreferrer" style={{ background: l.color }}>
-              {l.name}
-            </a>
-          ))}
-          <button style={{ background: "linear-gradient(45deg,#feda75,#d62976,#4f5bd5)", color: "#fff" }} onClick={() => viaApp("Instagram")}>
-            Instagram
-          </button>
-          <button style={{ background: "#000", color: "#fff" }} onClick={() => viaApp("TikTok")}>
-            TikTok
-          </button>
-          <button style={{ background: "#5865f2", color: "#fff" }} onClick={viaDiscord}>
-            Discord
-          </button>
-        </div>
-        )}
-
-        <div className="share-grid small">
+          )}
           <button onClick={() => blob && downloadBlob(blob)}>Baixar imagem</button>
-          <button onClick={async () => blob && setMsg((await copyImage(blob)) ? "Imagem copiada!" : "Não consegui copiar a imagem; use Baixar.")}>
+          <button
+            onClick={async () =>
+              blob && setMsg((await copyImage(blob)) ? "Imagem copiada!" : "Não consegui copiar a imagem; use Baixar.")}
+          >
             Copiar imagem
           </button>
         </div>

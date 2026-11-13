@@ -66,3 +66,5 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .share-note { font-size: .82rem; opacity: .75; margin: 12px 0 0; }
 .caption { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; margin-top: 12px; }
 .caption textarea { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid #0004; resize: vertical; }
+.share-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+.share-note { text-align: center; }
