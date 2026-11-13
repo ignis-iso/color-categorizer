@@ -61,7 +61,7 @@ interface Dict {
   language: string;
   // Modos e tamanho
   modeTitle: string;
-  modes: Record<Mode, { name: string; desc: string }>;
+  modes: Record<Mode, { name: string; desc: string; long: string }>;
   sizeTitle: string;
   sizeOpt: (n: number) => string;
   fixedTip: string;
@@ -137,11 +137,11 @@ const pt: Dict = {
   language: "Idioma",
   modeTitle: "Modo de classificação",
   modes: {
-    free: { name: "Livre", desc: "Dê os nomes que quiser" },
-    grid: { name: "Grade", desc: "Escolha as cores na grade e dê nomes às áreas" },
-    rgb: { name: "Primárias RGB", desc: "Vermelho, verde e azul" },
-    paint: { name: "Primárias de tinta", desc: "Azul, vermelho, verde e amarelo" },
-    rainbow: { name: "Arco-íris", desc: "As 7 cores do arco-íris" },
+    free: { name: "Livre", desc: "Dê os nomes que quiser", long: "As cores aparecem uma por vez, em ordem aleatória, para que a cor anterior não contamine a sua percepção da seguinte. Você dá a cada uma o nome que quiser, sem lista pronta, e o resultado mostra como você mesmo divide o espectro." },
+    grid: { name: "Grade", desc: "Escolha as cores na grade e dê nomes às áreas", long: "Aqui você vê todas as cores juntas na grade e nomeia áreas inteiras de uma vez. Como as cores ficam lado a lado, uma pode influenciar a percepção da vizinha — é justamente o contraste com o modo aleatório. Você mesmo desenha as fronteiras." },
+    rgb: { name: "Primárias RGB", desc: "Vermelho, verde e azul", long: "Para cada cor, escolha qual das três primárias da luz (vermelho, verde ou azul) ela mais lembra. As cores aparecem em ordem aleatória para não viciar o olhar. Mostra onde você coloca as fronteiras entre elas." },
+    paint: { name: "Primárias de tinta", desc: "Azul, vermelho, verde e amarelo", long: "Para cada cor, escolha entre as quatro cores básicas que muita gente aprende como “primárias” de tinta: azul, vermelho, verde e amarelo. A ordem é aleatória para que uma cor não influencie a próxima." },
+    rainbow: { name: "Arco-íris", desc: "As 7 cores do arco-íris", long: "Para cada cor, escolha em qual das 7 faixas do arco-íris ela cai, de vermelho a violeta. A ordem aleatória evita que a cor anterior contamine a sua percepção da seguinte." },
   },
   sizeTitle: "Tamanho do teste",
   sizeOpt: (n) => `${n} cores`,
@@ -217,11 +217,11 @@ const en: Dict = {
   language: "Language",
   modeTitle: "Classification mode",
   modes: {
-    free: { name: "Free", desc: "Name colors anything you like" },
-    grid: { name: "Grid", desc: "Pick colors on the grid and name the areas" },
-    rgb: { name: "RGB primaries", desc: "Red, green and blue" },
-    paint: { name: "Paint primaries", desc: "Blue, red, green and yellow" },
-    rainbow: { name: "Rainbow", desc: "The 7 colors of the rainbow" },
+    free: { name: "Free", desc: "Name colors anything you like", long: "Colors appear one at a time, in random order, so the previous color doesn’t bias how you see the next one. You give each the name you like, with no preset list, and the result shows how you divide the spectrum yourself." },
+    grid: { name: "Grid", desc: "Pick colors on the grid and name the areas", long: "Here you see all the colors together on the grid and name whole areas at once. Because the colors sit side by side, one can influence how you see its neighbor — that’s the contrast with the random-order modes. You draw the boundaries yourself." },
+    rgb: { name: "RGB primaries", desc: "Red, green and blue", long: "For each color, pick which of the three light primaries (red, green or blue) it most resembles. Colors appear in random order so your eye isn’t primed. It shows where you put the borders between them." },
+    paint: { name: "Paint primaries", desc: "Blue, red, green and yellow", long: "For each color, choose among the four basic colors many people learn as paint “primaries”: blue, red, green and yellow. The order is random so one color doesn’t influence the next." },
+    rainbow: { name: "Rainbow", desc: "The 7 colors of the rainbow", long: "For each color, pick which of the 7 rainbow bands it falls into, from red to violet. The random order keeps the previous color from biasing how you see the next one." },
   },
   sizeTitle: "Test size",
   sizeOpt: (n) => `${n} colors`,
@@ -297,11 +297,11 @@ const es: Dict = {
   language: "Idioma",
   modeTitle: "Modo de clasificación",
   modes: {
-    free: { name: "Libre", desc: "Pon los nombres que quieras" },
-    grid: { name: "Cuadrícula", desc: "Elige colores en la cuadrícula y nombra las áreas" },
-    rgb: { name: "Primarios RGB", desc: "Rojo, verde y azul" },
-    paint: { name: "Primarios de pintura", desc: "Azul, rojo, verde y amarillo" },
-    rainbow: { name: "Arcoíris", desc: "Los 7 colores del arcoíris" },
+    free: { name: "Libre", desc: "Pon los nombres que quieras", long: "Los colores aparecen uno a uno, en orden aleatorio, para que el color anterior no contamine tu percepción del siguiente. Le pones a cada uno el nombre que quieras, sin lista previa, y el resultado muestra cómo divides tú el espectro." },
+    grid: { name: "Cuadrícula", desc: "Elige colores en la cuadrícula y nombra las áreas", long: "Aquí ves todos los colores juntos en la cuadrícula y nombras áreas enteras a la vez. Al estar uno junto a otro, un color puede influir en cómo ves al vecino: ese es el contraste con los modos aleatorios. Tú mismo dibujas las fronteras." },
+    rgb: { name: "Primarios RGB", desc: "Rojo, verde y azul", long: "Para cada color, elige a cuál de los tres primarios de la luz (rojo, verde o azul) se parece más. Los colores aparecen en orden aleatorio para no condicionar tu mirada. Muestra dónde pones las fronteras entre ellos." },
+    paint: { name: "Primarios de pintura", desc: "Azul, rojo, verde y amarillo", long: "Para cada color, elige entre los cuatro colores básicos que mucha gente aprende como “primarios” de pintura: azul, rojo, verde y amarillo. El orden es aleatorio para que un color no influya en el siguiente." },
+    rainbow: { name: "Arcoíris", desc: "Los 7 colores del arcoíris", long: "Para cada color, elige en cuál de las 7 franjas del arcoíris cae, de rojo a violeta. El orden aleatorio evita que el color anterior contamine tu percepción del siguiente." },
   },
   sizeTitle: "Tamaño de la prueba",
   sizeOpt: (n) => `${n} colores`,

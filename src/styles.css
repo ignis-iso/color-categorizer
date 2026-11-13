@@ -81,3 +81,4 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .paintgrid { touch-action: none; cursor: crosshair; user-select: none; }
 .actions.center { justify-content: center; }
 .note { font-size: .85rem; opacity: .9; margin: 8px 0 0; }
+.modedesc { background: #e6e6e6; border-left: 4px solid #222; padding: 10px 14px; border-radius: 6px; font-size: .92rem; line-height: 1.5; margin: 4px 0 12px; }

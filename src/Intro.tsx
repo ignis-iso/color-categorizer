@@ -33,6 +33,8 @@ export default function Intro({ mode, size, onMode, onSize, onStart, onResume, r
         ))}
       </div>
 
+      <p className="modedesc">{t.modes[mode].long}</p>
+
       {mode !== "grid" && <h2>{t.sizeTitle}</h2>}
       {mode !== "grid" && (
       <div className="options sizes">
