@@ -17,6 +17,9 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
   });
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  // Quando a ação veio de um toque nas pílulas/voltar, não devolve o foco ao campo
+  // (evita o teclado do celular reabrir).
+  const skipFocus = useRef(false);
 
   const idx = order[pos];
   const color = COLORS[idx];
@@ -41,7 +44,8 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
 
   useEffect(() => {
     setText(labels[idx] ?? "");
-    inputRef.current?.focus();
+    if (!skipFocus.current) inputRef.current?.focus();
+    skipFocus.current = false;
     // deno-lint-ignore react-hooks/exhaustive-deps
   }, [pos]);
 
@@ -101,7 +105,10 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
               key={name}
               type="button"
               className={name === typed ? "chip active" : "chip"}
-              onClick={() => submit(name)}
+              onClick={() => {
+                skipFocus.current = true;
+                submit(name);
+              }}
             >
               {capitalize(name)} <span>{n}</span>
             </button>
@@ -110,7 +117,10 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
       )}
 
       <div className="nav">
-        <button type="button" disabled={pos === 0} onClick={() => setPos(pos - 1)}>
+        <button type="button" disabled={pos === 0} onClick={() => {
+            skipFocus.current = true;
+            setPos(pos - 1);
+          }}>
           ← Voltar
         </button>
         {allDone && (
