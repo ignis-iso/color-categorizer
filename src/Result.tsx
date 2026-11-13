@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { COLORS, GRID_SIZE } from "./colors.ts";
 import { capitalize } from "./util.ts";
 
 interface Props {
   labels: Record<number, string>;
   onRestart: () => void;
+  onChange: (idx: number, name: string) => void;
 }
 
 const CELL = 40;
@@ -99,7 +100,9 @@ function diagonalLinks(grid: string[]) {
   return links;
 }
 
-export default function Result({ labels, onRestart }: Props) {
+export default function Result({ labels, onRestart, onChange }: Props) {
+  const [editing, setEditing] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
   const grid = useMemo(() => COLORS.map((_, i) => labels[i] ?? "?"), [labels]);
 
   const { lines, regions, links, legend } = useMemo(() => {
@@ -130,6 +133,21 @@ export default function Result({ labels, onRestart }: Props) {
         Estas são as {legend.length} categorias que você criou para as{" "}
         {COLORS.length} cores.
       </p>
+
+      <div className="editbar">
+        <button
+          onClick={() => {
+            setEditing(!editing);
+            setSelected(null);
+          }}
+          className={editing ? "primary" : ""}
+        >
+          {editing ? "Concluir edição" : "Editar resultado"}
+        </button>
+        {editing && (
+          <span>Clique em um quadrado e escolha uma das suas categorias.</span>
+        )}
+      </div>
 
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="grid" role="img">
         {COLORS.map((c, i) => (
@@ -176,7 +194,57 @@ export default function Result({ labels, onRestart }: Props) {
             </text>
           );
         })}
+        {editing &&
+          COLORS.map((_, i) => (
+            <rect
+              key={`h${i}`}
+              x={(i % N) * CELL}
+              y={Math.floor(i / N) * CELL}
+              width={CELL}
+              height={CELL}
+              fill="transparent"
+              style={{ cursor: "pointer" }}
+              onClick={() => setSelected(i === selected ? null : i)}
+            />
+          ))}
+        {editing && selected !== null && (
+          <rect
+            x={(selected % N) * CELL + 2}
+            y={Math.floor(selected / N) * CELL + 2}
+            width={CELL - 4}
+            height={CELL - 4}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={3}
+            strokeDasharray="6 4"
+            pointerEvents="none"
+          />
+        )}
       </svg>
+
+      {editing && selected !== null && (
+        <div className="editpanel">
+          <i className="mini" style={{ background: COLORS[selected] }} />
+          <span>
+            Atual: <strong>{capitalize(grid[selected])}</strong>. Mover para:
+          </span>
+          <div className="chips">
+            {legend.map(([name]) => (
+              <button
+                key={name}
+                className={name === grid[selected] ? "chip active" : "chip"}
+                disabled={name === grid[selected]}
+                onClick={() => {
+                  onChange(selected, name);
+                  setSelected(null);
+                }}
+              >
+                {capitalize(name)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <p className="hint">
         Pontilhado preto e branco ligando duas células = elas pertencem à mesma categoria, mesmo se tocando só pela diagonal.

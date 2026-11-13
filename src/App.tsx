@@ -77,7 +77,7 @@ export default function App() {
           onFinish={() => setPhase("result")}
         />
       )}
-      {phase === "result" && <Result labels={labels} onRestart={restart} />}
+      {phase === "result" && <Result labels={labels} onRestart={restart} onChange={answer} />}
     </main>
   );
 }

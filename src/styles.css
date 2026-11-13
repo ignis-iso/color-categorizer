@@ -47,3 +47,8 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .legend i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #0004; }
 .legend span { opacity: .55; font-size: .8em; }
 .hint { font-size: .85rem; opacity: .9; margin: 10px 0 0; }
+.editbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; font-size: .9rem; }
+.editpanel { margin-top: 12px; background: #f2f2f2; color: var(--ink); border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.editpanel .mini { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #0004; display: inline-block; }
+.editpanel .chip { background: #e0e0e0; }
+.editpanel .chip.active { background: #222; color: #fff; }
