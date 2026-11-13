@@ -52,3 +52,4 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .editpanel .mini { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #0004; display: inline-block; }
 .editpanel .chip { background: #e0e0e0; }
 .editpanel .chip.active { background: #222; color: #fff; }
+.newcat { display: flex; gap: 8px; } .newcat input { padding: 6px 10px; font-size: 1rem; }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { COLORS, GRID_SIZE } from "./colors.ts";
-import { capitalize } from "./util.ts";
+import { capitalize, normalize } from "./util.ts";
 
 interface Props {
   labels: Record<number, string>;
@@ -103,6 +103,13 @@ function diagonalLinks(grid: string[]) {
 export default function Result({ labels, onRestart, onChange }: Props) {
   const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  const [newName, setNewName] = useState("");
+  const assign = (name: string) => {
+    if (selected === null || !normalize(name)) return;
+    onChange(selected, name);
+    setSelected(null);
+    setNewName("");
+  };
   const grid = useMemo(() => COLORS.map((_, i) => labels[i] ?? "?"), [labels]);
 
   const { lines, regions, links, legend } = useMemo(() => {
@@ -145,7 +152,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
           {editing ? "Concluir edição" : "Editar resultado"}
         </button>
         {editing && (
-          <span>Clique em um quadrado e escolha uma das suas categorias.</span>
+          <span>Clique em um quadrado e escolha uma categoria ou crie uma nova.</span>
         )}
       </div>
 
@@ -234,15 +241,29 @@ export default function Result({ labels, onRestart, onChange }: Props) {
                 key={name}
                 className={name === grid[selected] ? "chip active" : "chip"}
                 disabled={name === grid[selected]}
-                onClick={() => {
-                  onChange(selected, name);
-                  setSelected(null);
-                }}
+                onClick={() => assign(name)}
               >
                 {capitalize(name)}
               </button>
             ))}
           </div>
+          <form
+            className="newcat"
+            onSubmit={(e) => {
+              e.preventDefault();
+              assign(newName);
+            }}
+          >
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Nova categoria…"
+              maxLength={30}
+            />
+            <button type="submit" disabled={!normalize(newName)}>
+              Criar e mover
+            </button>
+          </form>
         </div>
       )}
 
