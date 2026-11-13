@@ -11,10 +11,20 @@ const CELL = 40;
 const N = GRID_SIZE;
 const SIZE = CELL * N;
 
-/** Centro (em células) do maior componente conexo de cada categoria. */
-function labelPositions(grid: string[]) {
+interface Region {
+  name: string;
+  size: number;
+  r: number;
+  c: number;
+  width: number; // largura em células do retângulo envolvente
+}
+
+const DIRS8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+
+/** Regiões = componentes conexos (8 vizinhos) de cada categoria; cada uma ganha um rótulo. */
+function findRegions(grid: string[]): Region[] {
   const seen = new Array<boolean>(grid.length).fill(false);
-  const best = new Map<string, { size: number; r: number; c: number }>();
+  const regions: Region[] = [];
   for (let s = 0; s < grid.length; s++) {
     if (seen[s]) continue;
     const name = grid[s];
@@ -25,7 +35,7 @@ function labelPositions(grid: string[]) {
       const cur = stack.pop()!;
       cells.push(cur);
       const r = Math.floor(cur / N), c = cur % N;
-      for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      for (const [dr, dc] of DIRS8) {
         const rr = r + dr, cc = c + dc;
         if (rr < 0 || cc < 0 || rr >= N || cc >= N) continue;
         const n = rr * N + cc;
@@ -35,26 +45,48 @@ function labelPositions(grid: string[]) {
         }
       }
     }
-    const prev = best.get(name);
-    if (!prev || cells.length > prev.size) {
-      // célula do componente mais próxima do centróide (para o rótulo cair dentro da região)
-      const mr = cells.reduce((a, x) => a + Math.floor(x / N), 0) / cells.length;
-      const mc = cells.reduce((a, x) => a + (x % N), 0) / cells.length;
-      let pick = cells[0], d = Infinity;
-      for (const x of cells) {
-        const dd = (Math.floor(x / N) - mr) ** 2 + ((x % N) - mc) ** 2;
-        if (dd < d) { d = dd; pick = x; }
+    const mr = cells.reduce((a, x) => a + Math.floor(x / N), 0) / cells.length;
+    const mc = cells.reduce((a, x) => a + (x % N), 0) / cells.length;
+    let pick = cells[0], d = Infinity;
+    for (const x of cells) {
+      const dd = (Math.floor(x / N) - mr) ** 2 + ((x % N) - mc) ** 2;
+      if (dd < d) { d = dd; pick = x; }
+    }
+    const cols = cells.map((x) => x % N);
+    regions.push({
+      name,
+      size: cells.length,
+      r: Math.floor(pick / N),
+      c: pick % N,
+      width: Math.max(...cols) - Math.min(...cols) + 1,
+    });
+  }
+  return regions;
+}
+
+/** Pares de células da mesma categoria que só se tocam pela diagonal (sem vizinho em comum). */
+function diagonalLinks(grid: string[]) {
+  const links: { r1: number; c1: number; r2: number; c2: number }[] = [];
+  for (let r = 0; r + 1 < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const a = grid[r * N + c];
+      for (const dc of [1, -1]) {
+        const c2 = c + dc;
+        if (c2 < 0 || c2 >= N) continue;
+        if (grid[(r + 1) * N + c2] !== a) continue;
+        // os dois vizinhos ortogonais em comum são de outra categoria => ligação só pela diagonal
+        if (grid[r * N + c2] !== a && grid[(r + 1) * N + c] !== a)
+          links.push({ r1: r, c1: c, r2: r + 1, c2 });
       }
-      best.set(name, { size: cells.length, r: Math.floor(pick / N), c: pick % N });
     }
   }
-  return best;
+  return links;
 }
 
 export default function Result({ labels, onRestart }: Props) {
   const grid = useMemo(() => COLORS.map((_, i) => labels[i] ?? "?"), [labels]);
 
-  const { lines, labelsPos, legend } = useMemo(() => {
+  const { lines, regions, links, legend } = useMemo(() => {
     const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
     for (let r = 0; r < N; r++) {
       for (let c = 0; c < N; c++) {
@@ -69,7 +101,8 @@ export default function Result({ labels, onRestart }: Props) {
     grid.forEach((g) => count.set(g, (count.get(g) ?? 0) + 1));
     return {
       lines,
-      labelsPos: labelPositions(grid),
+      regions: findRegions(grid),
+      links: diagonalLinks(grid),
       legend: [...count.entries()].sort((a, b) => b[1] - a[1]),
     };
   }, [grid]);
@@ -97,20 +130,41 @@ export default function Result({ labels, onRestart }: Props) {
           <line key={i} {...l} stroke="#111" strokeWidth={3} strokeLinecap="square" />
         ))}
         <rect x={0} y={0} width={SIZE} height={SIZE} fill="none" stroke="#111" strokeWidth={4} />
-        {[...labelsPos.entries()].map(([name, p]) => (
-          <text
-            key={name}
-            x={p.c * CELL + CELL / 2}
-            y={p.r * CELL + CELL / 2}
-            textAnchor="middle"
-            dominantBaseline="central"
-            className="region-label"
-            fontSize={p.size > 6 ? 22 : p.size > 2 ? 15 : 11}
-          >
-            {capitalize(name)}
-          </text>
-        ))}
+        {links.map((l, i) => {
+          const p = {
+            x1: l.c1 * CELL + CELL / 2, y1: l.r1 * CELL + CELL / 2,
+            x2: l.c2 * CELL + CELL / 2, y2: l.r2 * CELL + CELL / 2,
+          };
+          return (
+            <g key={`l${i}`} strokeLinecap="round">
+              <line {...p} stroke="#111" strokeWidth={9} />
+              <line {...p} stroke="#fff" strokeWidth={4} strokeDasharray="1 7" />
+            </g>
+          );
+        })}
+        {regions.map((rg, i) => {
+          const len = Math.max(rg.name.length, 1);
+          const fit = (CELL * Math.max(rg.width, 1) * 0.92) / (len * 0.62);
+          const base = rg.size > 6 ? 22 : rg.size > 2 ? 15 : 11;
+          return (
+            <text
+              key={i}
+              x={rg.c * CELL + CELL / 2}
+              y={rg.r * CELL + CELL / 2}
+              textAnchor="middle"
+              dominantBaseline="central"
+              className="region-label"
+              fontSize={Math.max(8, Math.min(base, fit))}
+            >
+              {capitalize(rg.name)}
+            </text>
+          );
+        })}
       </svg>
+
+      <p className="hint">
+        Pontilhado preto e branco ligando duas células = elas pertencem à mesma categoria, mesmo se tocando só pela diagonal.
+      </p>
 
       <ul className="legend">
         {legend.map(([name, n]) => {

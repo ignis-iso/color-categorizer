@@ -46,3 +46,4 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .legend li { display: flex; align-items: center; gap: 8px; background: #f2f2f2; color: var(--ink); padding: 6px 12px; border-radius: 999px; }
 .legend i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #0004; }
 .legend span { opacity: .55; font-size: .8em; }
+.hint { font-size: .85rem; opacity: .9; margin: 10px 0 0; }
