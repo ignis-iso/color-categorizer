@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import {
   canShareFiles,
   copyImage,
+  defaultCaption,
   downloadBlob,
   makeShareBlob,
   nativeShare,
-  shareText,
   shareUrl,
 } from "./shareImage.ts";
 
@@ -18,6 +18,7 @@ export default function ShareModal({ grid, onClose }: Props) {
   const [blob, setBlob] = useState<Blob | null>(null);
   const [preview, setPreview] = useState("");
   const [msg, setMsg] = useState("");
+  const [caption, setCaption] = useState(defaultCaption);
 
   useEffect(() => {
     let url = "";
@@ -34,15 +35,16 @@ export default function ShareModal({ grid, onClose }: Props) {
     };
   }, [grid, onClose]);
 
-  const text = encodeURIComponent(shareText());
+  const both = encodeURIComponent(caption);
   const link = encodeURIComponent(shareUrl());
-  const both = encodeURIComponent(`${shareText()} ${shareUrl()}`);
+  // X e Telegram recebem o link separado; tira-o do texto para não duplicar.
+  const textOnly = encodeURIComponent(caption.replace(shareUrl(), "").trim());
 
   const links = [
     { name: "WhatsApp", color: "#25d366", href: `https://wa.me/?text=${both}` },
-    { name: "X / Twitter", color: "#111", href: `https://twitter.com/intent/tweet?text=${text}&url=${link}` },
+    { name: "X / Twitter", color: "#111", href: `https://twitter.com/intent/tweet?text=${textOnly}&url=${link}` },
     { name: "Facebook", color: "#1877f2", href: `https://www.facebook.com/sharer/sharer.php?u=${link}` },
-    { name: "Telegram", color: "#2aabee", href: `https://t.me/share/url?url=${link}&text=${text}` },
+    { name: "Telegram", color: "#2aabee", href: `https://t.me/share/url?url=${link}&text=${textOnly}` },
   ];
 
   const native = blob !== null && canShareFiles(blob);
@@ -51,9 +53,16 @@ export default function ShareModal({ grid, onClose }: Props) {
   // ou baixa a imagem para o usuário postar no app.
   const viaApp = async (app: string) => {
     if (!blob) return;
-    if (native && (await nativeShare(blob))) return;
+    if (native && (await nativeShare(blob, caption))) return;
     downloadBlob(blob);
-    setMsg(`Imagem baixada! Abra o ${app} e publique a imagem salva.`);
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(caption);
+      copied = true;
+    } catch { /* ignore */ }
+    setMsg(
+      `Imagem baixada${copied ? " e legenda copiada" : ""}! Abra o ${app}, publique a imagem${copied ? " e cole a legenda" : ""}.`,
+    );
   };
 
   return (
@@ -66,9 +75,14 @@ export default function ShareModal({ grid, onClose }: Props) {
           {preview ? <img src={preview} alt="Prévia da imagem para compartilhar" /> : <p>Gerando imagem…</p>}
         </div>
 
+        <label className="caption">
+          Texto da publicação (com o link do site)
+          <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} />
+        </label>
+
         <div className="share-grid">
           {native && (
-            <button className="primary wide" onClick={() => blob && nativeShare(blob)}>
+            <button className="primary wide" onClick={() => blob && nativeShare(blob, caption)}>
               Compartilhar com a imagem…
             </button>
           )}
@@ -93,19 +107,19 @@ export default function ShareModal({ grid, onClose }: Props) {
           <button
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(shareUrl());
-                setMsg("Link copiado!");
+                await navigator.clipboard.writeText(caption);
+                setMsg("Texto copiado!");
               } catch {
-                setMsg(shareUrl());
+                setMsg("Não consegui copiar; selecione o texto acima.");
               }
             }}
           >
-            Copiar link
+            Copiar texto
           </button>
         </div>
 
         <p className="share-note">
-          {msg || "Os botões de rede abrem com o texto e o link. Para anexar a imagem, baixe-a ou use o menu do celular."}
+          {msg || "Os botões de rede abrem com o texto acima. Para anexar a imagem, baixe-a ou use o menu do celular."}
         </p>
       </div>
     </div>

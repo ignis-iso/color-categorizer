@@ -156,6 +156,8 @@ export const SHARE_TITLE = "Seu vermelho é o meu vermelho?";
 export const shareUrl = () => location.origin + location.pathname;
 export const shareText = () =>
   "Este é o meu gráfico de categorização de cores. Seu vermelho é o meu vermelho? Faça o seu:";
+/** Legenda padrão: texto + link do site. */
+export const defaultCaption = () => `${shareText()} ${shareUrl()}`;
 
 export async function makeShareBlob(grid: string[]): Promise<Blob> {
   const canvas = renderShareCanvas(grid);
@@ -173,13 +175,13 @@ export function canShareFiles(blob: Blob): boolean {
   return !!nav.canShare?.({ files: [file] });
 }
 
-export async function nativeShare(blob: Blob): Promise<boolean> {
+export async function nativeShare(blob: Blob, text: string): Promise<boolean> {
   const file = new File([blob], FILE_NAME, { type: "image/png" });
   try {
     await navigator.share({
       files: [file],
       title: SHARE_TITLE,
-      text: `${shareText()} ${shareUrl()}`,
+      text,
     });
     return true;
   } catch (e) {
