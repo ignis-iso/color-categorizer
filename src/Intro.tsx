@@ -1,4 +1,5 @@
 import { COLORS } from "./colors.ts";
+import { useT } from "./i18n.ts";
 
 interface Props {
   onStart: () => void;
@@ -7,58 +8,35 @@ interface Props {
 }
 
 export default function Intro({ onStart, onResume, resumeCount }: Props) {
+  const t = useT();
   return (
     <section className="card intro">
-      <h1>Seu vermelho é o meu vermelho?</h1>
-      <p className="lead">
-        Faça esse teste desnecessariamente longo e descubra o seu gráfico de
-        categorização de cor. São {COLORS.length} cores, o que pode demorar um
-        pouco.
-      </p>
+      <h1>{t.titleTpl(t.titleColors[0])}</h1>
+      <p className="lead">{t.introLead(COLORS.length)}</p>
 
-      <h2>Como funciona</h2>
+      <h2>{t.howTitle}</h2>
       <ol>
-        <li>
-          Uma cor por vez aparece na tela, em um fundo cinza neutro, em ordem
-          aleatória.
-        </li>
-        <li>
-          Dê a ela <strong>o nome que quiser</strong>: “verde”, “roxo”,
-          “salmão”… não existe resposta certa.
-        </li>
-        <li>No final, mostramos a grade de cores dividida pelas suas categorias.</li>
+        {t.how.map((h, i) => (
+          <li key={i}>{h}</li>
+        ))}
       </ol>
 
-      <h2>Antes de começar</h2>
+      <h2>{t.beforeTitle}</h2>
       <ul className="tips">
-        <li>
-          <strong>Use poucos nomes.</strong> Tente ficar com algo entre 6 e 12
-          categorias no total. Se der um nome diferente para cada tom, a grade
-          final perde o sentido.
-        </li>
-        <li>
-          <strong>Prefira nomes de cor “básicos”</strong> (azul, verde,
-          amarelo…) em vez de tons muito específicos (azul-petróleo-claro).
-        </li>
-        <li>
-          Nomes que você já usou aparecem como botões — reaproveite-os sempre
-          que a cor ainda couber neles.
-        </li>
-        <li>
-          Só crie um nome novo quando a cor realmente não combinar com nenhum
-          dos anteriores.
-        </li>
-        <li>Não pense demais: vale a primeira impressão.</li>
+        {t.tips.map(([b, rest], i) => (
+          <li key={i}>
+            {b && <strong>{b}</strong>}
+            {rest}
+          </li>
+        ))}
       </ul>
 
       <div className="actions">
         <button className="primary" onClick={onStart}>
-          Começar
+          {t.start}
         </button>
         {onResume && (
-          <button onClick={onResume}>
-            Continuar de onde parei ({resumeCount}/{COLORS.length})
-          </button>
+          <button onClick={onResume}>{t.resume(resumeCount, COLORS.length)}</button>
         )}
       </div>
     </section>

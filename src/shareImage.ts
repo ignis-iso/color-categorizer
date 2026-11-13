@@ -1,6 +1,7 @@
 import { COLORS, GRID_SIZE } from "./colors.ts";
 import { diagonalLinks, findRegions } from "./regions.ts";
 import { capitalize } from "./util.ts";
+import { t } from "./i18n.ts";
 
 const N = GRID_SIZE;
 const W = 1080, H = 1350;
@@ -34,9 +35,10 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `800 58px ${FONT}`;
-  ctx.fillText("Seu vermelho é o meu vermelho?", W / 2, 80);
+  const tr = t();
+  ctx.fillText(tr.titleTpl(tr.titleColors[0]), W / 2, 80);
   ctx.font = `500 30px ${FONT}`;
-  ctx.fillText("Este é o meu gráfico de categorização de cores", W / 2, 134);
+  ctx.fillText(tr.imgSubtitle, W / 2, 134);
 
   // Células
   COLORS.forEach((c, i) => {
@@ -148,14 +150,13 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
   ctx.fillStyle = "#ffffffcc";
   ctx.textAlign = "center";
   ctx.font = `500 26px ${FONT}`;
-  ctx.fillText(`Faça o seu: ${location.host}${location.pathname}`, W / 2, H - 36);
+  ctx.fillText(`${tr.imgFooter} ${location.host}${location.pathname}`, W / 2, H - 36);
   return canvas;
 }
 
-export const SHARE_TITLE = "Seu vermelho é o meu vermelho?";
+export const shareTitle = () => t().titleTpl(t().titleColors[0]);
 export const shareUrl = () => location.origin + location.pathname;
-export const shareText = () =>
-  "Este é o meu gráfico de categorização de cores. Seu vermelho é o meu vermelho? Faça o seu:";
+export const shareText = () => t().shareText;
 /** Legenda padrão: texto + link do site. */
 export const defaultCaption = () => `${shareText()} ${shareUrl()}`;
 
@@ -180,7 +181,7 @@ export async function nativeShare(blob: Blob, text: string): Promise<boolean> {
   try {
     await navigator.share({
       files: [file],
-      title: SHARE_TITLE,
+      title: shareTitle(),
       text,
     });
     return true;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COLORS } from "./colors.ts";
 import { capitalize, normalize } from "./util.ts";
+import { useT } from "./i18n.ts";
 
 interface Props {
   order: number[];
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function Game({ order, labels, onAnswer, onFinish }: Props) {
+  const t = useT();
   // Começa na primeira cor ainda sem nome (útil ao retomar).
   const [pos, setPos] = useState(() => {
     const first = order.findIndex((i) => labels[i] === undefined);
@@ -63,12 +65,11 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
 
   return (
     <section className="game">
-      <div className="progress" aria-label="progresso">
+      <div className="progress" aria-label={t.progressLabel}>
         <div className="bar" style={{ width: `${(done / COLORS.length) * 100}%` }} />
       </div>
       <p className="counter">
-        Cor {pos + 1} de {COLORS.length} · {used.length} categoria
-        {used.length === 1 ? "" : "s"} em uso
+        {t.counter(pos + 1, COLORS.length, used.length)}
       </p>
 
       <div className="swatch" style={{ background: color }} />
@@ -83,18 +84,18 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
           ref={inputRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Que cor é essa?"
+          placeholder={t.placeholder}
           autoComplete="off"
           maxLength={30}
         />
         <button className="primary" type="submit" disabled={!typed}>
-          {pos + 1 === order.length ? "Concluir" : "Próxima"}
+          {pos + 1 === order.length ? t.finish : t.next}
         </button>
       </form>
 
       {isNew && used.length >= 12 && (
         <p className="warn">
-          Você já tem {used.length} categorias — tente reaproveitar uma delas.
+          {t.tooMany(used.length)}
         </p>
       )}
 
@@ -121,11 +122,11 @@ export default function Game({ order, labels, onAnswer, onFinish }: Props) {
             skipFocus.current = true;
             setPos(pos - 1);
           }}>
-          ← Voltar
+          {t.back}
         </button>
         {allDone && (
           <button type="button" onClick={onFinish}>
-            Ver resultado
+            {t.seeResult}
           </button>
         )}
       </div>

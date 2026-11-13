@@ -4,6 +4,7 @@ import { normalize, shuffle } from "./util.ts";
 import Intro from "./Intro.tsx";
 import Game from "./Game.tsx";
 import Result from "./Result.tsx";
+import { getLang, LANGS, setLang, useT, type Lang } from "./i18n.ts";
 
 type Phase = "intro" | "play" | "result";
 const KEY = "color-categorizer:v1";
@@ -23,6 +24,7 @@ function load(): Saved | null {
 }
 
 export default function App() {
+  const t = useT();
   const [phase, setPhase] = useState<Phase>("intro");
   const [order, setOrder] = useState<number[]>([]);
   const [labels, setLabels] = useState<Record<number, string>>({});
@@ -62,6 +64,16 @@ export default function App() {
 
   return (
     <main className={`app app-${phase}`}>
+      <select
+        className="lang"
+        aria-label={t.language}
+        value={getLang()}
+        onChange={(e) => setLang(e.target.value as Lang)}
+      >
+        {LANGS.map((l) => (
+          <option key={l.code} value={l.code}>{l.label}</option>
+        ))}
+      </select>
       {phase === "intro" && (
         <Intro
           onStart={start}

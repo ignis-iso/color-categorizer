@@ -7,6 +7,7 @@ import {
   makeShareBlob,
   nativeShare,
 } from "./shareImage.ts";
+import { useT } from "./i18n.ts";
 
 interface Props {
   grid: string[];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function ShareModal({ grid, onClose }: Props) {
+  const t = useT();
   const [blob, setBlob] = useState<Blob | null>(null);
   const [preview, setPreview] = useState("");
   const [msg, setMsg] = useState("");
@@ -40,25 +42,25 @@ export default function ShareModal({ grid, onClose }: Props) {
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-        <button className="close" onClick={onClose} aria-label="Fechar">×</button>
-        <h2>Compartilhar meu gráfico</h2>
+        <button className="close" onClick={onClose} aria-label={t.close}>×</button>
+        <h2>{t.shareTitle}</h2>
 
         <div className="preview">
-          {preview ? <img src={preview} alt="Prévia da imagem para compartilhar" /> : <p>Gerando imagem…</p>}
+          {preview ? <img src={preview} alt={t.previewAlt} /> : <p>{t.generating}</p>}
         </div>
 
         <div className="share-actions">
           {native && (
             <button className="primary" onClick={() => blob && nativeShare(blob, caption)}>
-              Compartilhar com a imagem…
+              {t.shareNative}
             </button>
           )}
-          <button onClick={() => blob && downloadBlob(blob)}>Baixar imagem</button>
+          <button onClick={() => blob && downloadBlob(blob)}>{t.download}</button>
           <button
             onClick={async () =>
-              blob && setMsg((await copyImage(blob)) ? "Imagem copiada!" : "Não consegui copiar a imagem; use Baixar.")}
+              blob && setMsg((await copyImage(blob)) ? t.copied : t.copyFail)}
           >
-            Copiar imagem
+            {t.copyImage}
           </button>
         </div>
 

@@ -3,6 +3,7 @@ import { COLORS, GRID_SIZE } from "./colors.ts";
 import { capitalize, normalize } from "./util.ts";
 import { diagonalLinks, findRegions } from "./regions.ts";
 import ShareModal from "./ShareModal.tsx";
+import { useT } from "./i18n.ts";
 
 interface Props {
   labels: Record<number, string>;
@@ -15,6 +16,7 @@ const N = GRID_SIZE;
 const SIZE = CELL * N;
 
 export default function Result({ labels, onRestart, onChange }: Props) {
+  const t = useT();
   const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
@@ -50,10 +52,9 @@ export default function Result({ labels, onRestart, onChange }: Props) {
 
   return (
     <section className="result">
-      <h1>Seu gráfico de cores</h1>
+      <h1>{t.resultTitle}</h1>
       <p className="lead">
-        Estas são as {legend.length} categorias que você criou para as{" "}
-        {COLORS.length} cores.
+        {t.resultLead(legend.length, COLORS.length)}
       </p>
 
       <div className="editbar">
@@ -64,10 +65,10 @@ export default function Result({ labels, onRestart, onChange }: Props) {
           }}
           className={editing ? "primary" : ""}
         >
-          {editing ? "Concluir edição" : "Editar resultado"}
+          {editing ? t.doneEditing : t.edit}
         </button>
         {editing && (
-          <span>Clique em um quadrado e escolha uma categoria ou crie uma nova.</span>
+          <span>{t.editHint}</span>
         )}
       </div>
 
@@ -148,7 +149,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
         <div className="editpanel">
           <i className="mini" style={{ background: COLORS[selected] }} />
           <span>
-            Atual: <strong>{capitalize(grid[selected])}</strong>. Mover para:
+            {t.current}: <strong>{capitalize(grid[selected])}</strong>. {t.moveTo}
           </span>
           <div className="chips">
             {legend.map(([name]) => (
@@ -172,18 +173,18 @@ export default function Result({ labels, onRestart, onChange }: Props) {
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Nova categoria…"
+              placeholder={t.newCategory}
               maxLength={30}
             />
             <button type="submit" disabled={!normalize(newName)}>
-              Criar e mover
+              {t.createMove}
             </button>
           </form>
         </div>
       )}
 
       <p className="hint">
-        Pontilhado preto e branco ligando duas células = elas pertencem à mesma categoria, mesmo se tocando só pela diagonal.
+        {t.diagHint}
       </p>
 
       <ul className="legend">
@@ -200,10 +201,10 @@ export default function Result({ labels, onRestart, onChange }: Props) {
 
       <div className="actions">
         <button className="primary" onClick={() => setSharing(true)}>
-          Compartilhar imagem
+          {t.shareImage}
         </button>
         <button onClick={onRestart}>
-          Refazer o teste
+          {t.restart}
         </button>
       </div>
       {sharing && <ShareModal grid={grid} onClose={() => setSharing(false)} />}

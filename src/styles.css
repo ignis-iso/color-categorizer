@@ -68,3 +68,4 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .caption textarea { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid #0004; resize: vertical; }
 .share-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
 .share-note { text-align: center; }
+.lang { position: fixed; top: 10px; right: 10px; z-index: 5; padding: 6px 8px; border-radius: 8px; border: 1px solid #0004; background: #f2f2f2; font: inherit; font-size: .85rem; }
