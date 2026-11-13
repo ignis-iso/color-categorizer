@@ -152,28 +152,56 @@ export function renderShareCanvas(grid: string[]): HTMLCanvasElement {
   return canvas;
 }
 
-export async function shareImage(grid: string[]) {
+export const SHARE_TITLE = "Seu vermelho é o meu vermelho?";
+export const shareUrl = () => location.origin + location.pathname;
+export const shareText = () =>
+  "Este é o meu gráfico de categorização de cores. Seu vermelho é o meu vermelho? Faça o seu:";
+
+export async function makeShareBlob(grid: string[]): Promise<Blob> {
   const canvas = renderShareCanvas(grid);
-  const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/png"));
-  if (!blob) return;
-  const file = new File([blob], "meu-grafico-de-cores.png", { type: "image/png" });
+  return await new Promise<Blob>((res, rej) =>
+    canvas.toBlob((b) => (b ? res(b) : rej(new Error("toBlob falhou"))), "image/png")
+  );
+}
+
+const FILE_NAME = "meu-grafico-de-cores.png";
+
+/** Menu nativo de compartilhar (celulares): inclui Instagram, TikTok, WhatsApp etc. com a imagem. */
+export function canShareFiles(blob: Blob): boolean {
   const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  if (nav.canShare?.({ files: [file] })) {
-    try {
-      await nav.share({
-        files: [file],
-        title: "Seu vermelho é o meu vermelho?",
-        text: "Meu gráfico de categorização de cores. Faça o seu!",
-      });
-      return;
-    } catch (e) {
-      if ((e as DOMException).name === "AbortError") return;
-    }
+  const file = new File([blob], FILE_NAME, { type: "image/png" });
+  return !!nav.canShare?.({ files: [file] });
+}
+
+export async function nativeShare(blob: Blob): Promise<boolean> {
+  const file = new File([blob], FILE_NAME, { type: "image/png" });
+  try {
+    await navigator.share({
+      files: [file],
+      title: SHARE_TITLE,
+      text: `${shareText()} ${shareUrl()}`,
+    });
+    return true;
+  } catch (e) {
+    if ((e as DOMException).name === "AbortError") return true;
+    return false;
   }
+}
+
+export function downloadBlob(blob: Blob) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = file.name;
+  a.download = FILE_NAME;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+export async function copyImage(blob: Blob): Promise<boolean> {
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+    return true;
+  } catch {
+    return false;
+  }
 }

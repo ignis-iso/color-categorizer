@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { COLORS, GRID_SIZE } from "./colors.ts";
 import { capitalize, normalize } from "./util.ts";
 import { diagonalLinks, findRegions } from "./regions.ts";
-import { shareImage } from "./shareImage.ts";
+import ShareModal from "./ShareModal.tsx";
 
 interface Props {
   labels: Record<number, string>;
@@ -18,6 +18,7 @@ export default function Result({ labels, onRestart, onChange }: Props) {
   const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
+  const [sharing, setSharing] = useState(false);
   const assign = (name: string) => {
     if (selected === null || !normalize(name)) return;
     onChange(selected, name);
@@ -198,13 +199,14 @@ export default function Result({ labels, onRestart, onChange }: Props) {
       </ul>
 
       <div className="actions">
-        <button className="primary" onClick={() => shareImage(grid)}>
+        <button className="primary" onClick={() => setSharing(true)}>
           Compartilhar imagem
         </button>
         <button onClick={onRestart}>
           Refazer o teste
         </button>
       </div>
+      {sharing && <ShareModal grid={grid} onClose={() => setSharing(false)} />}
     </section>
   );
 }

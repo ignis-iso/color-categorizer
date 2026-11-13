@@ -53,3 +53,14 @@ input { flex: 1; font: inherit; font-size: 1.1rem; padding: 10px 14px; border-ra
 .editpanel .chip { background: #e0e0e0; }
 .editpanel .chip.active { background: #222; color: #fff; }
 .newcat { display: flex; gap: 8px; } .newcat input { padding: 6px 10px; font-size: 1rem; }
+.modal-bg { position: fixed; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.modal { position: relative; background: #f2f2f2; color: var(--ink); border-radius: 14px; padding: 20px 24px; width: 100%; max-width: 480px; max-height: 94vh; overflow-y: auto; }
+.modal h2 { margin: 0 0 12px; font-size: 1.2rem; }
+.modal .close { position: absolute; top: 10px; right: 12px; padding: 2px 10px; font-size: 1.4rem; line-height: 1.2; }
+.preview { background: #808080; border-radius: 8px; padding: 8px; display: flex; justify-content: center; min-height: 80px; align-items: center; color: #fff; }
+.preview img { max-height: 38vh; max-width: 100%; border-radius: 4px; }
+.share-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.share-grid a, .share-grid button { text-align: center; text-decoration: none; color: #fff; padding: 10px 6px; border-radius: 8px; font-size: .9rem; border: 0; }
+.share-grid.small button { background: #e0e0e0; color: var(--ink); }
+.share-grid .wide { grid-column: 1 / -1; background: #222; }
+.share-note { font-size: .82rem; opacity: .75; margin: 12px 0 0; }
