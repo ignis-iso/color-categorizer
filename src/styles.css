@@ -131,3 +131,10 @@ button.option:hover:not(:disabled):not(.active) { background: #d0d0d0; }
   .optwrap { flex: 1 1 100%; }
   .sizes .optwrap { flex: 1 1 28%; align-items: stretch; }
 }
+
+/* Botões da mesma linha com a mesma altura; "Recomendado" fica solto abaixo, sem ocupar espaço do botão */
+.options { row-gap: 24px; }
+.optwrap { position: relative; flex-direction: row; }
+.optwrap .option { flex: 1; width: auto; }
+.rec { position: absolute; left: 2px; top: calc(100% + 4px); white-space: nowrap; }
+.options.sizes { margin-bottom: 26px; }
