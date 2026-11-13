@@ -123,9 +123,7 @@ export default function ShareModal({ grid, onClose }: Props) {
           </button>
         </div>
 
-        <p className="share-note">
-          {msg || "Os botões de rede abrem com um texto e o link do site. Para anexar a imagem, baixe-a ou use o menu do celular."}
-        </p>
+        {msg && <p className="share-note">{msg}</p>}
       </div>
     </div>
   );
