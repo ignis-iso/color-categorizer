@@ -68,6 +68,7 @@ interface Dict {
   inferNote: (n: number) => string;
   editHintFixed: string;
   catNames: Record<string, string>;
+  recommended: string;
   // Modo grade
   gridTip: string;
   paintHint: string;
@@ -148,6 +149,7 @@ const pt: Dict = {
   fixedTip: "Para cada cor, escolha a categoria mais próxima. Não existe resposta certa!",
   inferNote: (n) => `Com ${n} cores testadas, as demais foram preenchidas pela cor testada mais próxima.`,
   editHintFixed: "Clique em um quadrado e escolha a categoria.",
+  recommended: "Recomendado",
   catNames: { red: "Vermelho", green: "Verde", blue: "Azul", yellow: "Amarelo", orange: "Laranja", indigo: "Anil", violet: "Violeta" },
   gridTip: "Selecione cores na grade e dê um nome a cada área.",
   paintHint: "Toque ou arraste sobre os quadrados para selecioná-los, escolha um nome e aplique. Faça isso até classificar todas as cores.",
@@ -228,6 +230,7 @@ const en: Dict = {
   fixedTip: "For each color, pick the closest category. There is no right answer!",
   inferNote: (n) => `With ${n} colors tested, the others were filled in from the closest tested color.`,
   editHintFixed: "Click a square and pick the category.",
+  recommended: "Recommended",
   catNames: { red: "Red", green: "Green", blue: "Blue", yellow: "Yellow", orange: "Orange", indigo: "Indigo", violet: "Violet" },
   gridTip: "Select colors on the grid and give each area a name.",
   paintHint: "Tap or drag over the squares to select them, choose a name and apply it. Keep going until every color is classified.",
@@ -308,6 +311,7 @@ const es: Dict = {
   fixedTip: "Para cada color, elige la categoría más cercana. ¡No hay respuesta correcta!",
   inferNote: (n) => `Con ${n} colores probados, el resto se completó con el color probado más cercano.`,
   editHintFixed: "Haz clic en un cuadrado y elige la categoría.",
+  recommended: "Recomendado",
   catNames: { red: "Rojo", green: "Verde", blue: "Azul", yellow: "Amarillo", orange: "Naranja", indigo: "Índigo", violet: "Violeta" },
   gridTip: "Selecciona colores en la cuadrícula y ponle nombre a cada área.",
   paintHint: "Toca o arrastra sobre los cuadrados para seleccionarlos, elige un nombre y aplícalo. Sigue hasta clasificar todos los colores.",

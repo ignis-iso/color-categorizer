@@ -108,3 +108,5 @@ button:disabled { opacity: .5; }
   .sizes .option { flex: 1 1 28%; align-items: center; text-align: center; }
   form { flex-wrap: nowrap; }
 }
+.badge { font-style: normal; font-size: .68rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; background: #2e7d32; color: #fff; padding: 2px 8px; border-radius: 999px; margin-top: 2px; }
+.option .badge { opacity: 1; font-size: .68rem; }

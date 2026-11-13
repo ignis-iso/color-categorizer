@@ -28,6 +28,7 @@ export default function Intro({ mode, size, onMode, onSize, onStart, onResume, r
             onClick={() => onMode(m)}
           >
             <strong>{t.modes[m].name}</strong>
+            {m === "free" && <em className="badge">{t.recommended}</em>}
             <span>{t.modes[m].desc}</span>
           </button>
         ))}
@@ -46,6 +47,7 @@ export default function Intro({ mode, size, onMode, onSize, onStart, onResume, r
             onClick={() => onSize(s)}
           >
             <strong>{t.sizeOpt(s)}</strong>
+            {s === 256 && <em className="badge">{t.recommended}</em>}
           </button>
         ))}
       </div>
